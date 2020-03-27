@@ -1,41 +1,67 @@
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require('dotenv').config();
+const PORT = process.env.PORT || 3000
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var flash = require('connect-flash');
+
+var passport = require("passport");
+var request = require('request');
+
+var session = require("express-session");
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.use(require('cookie-parser')());
+app.use(require('body-parser').urlencoded({ extended: true }));
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use(passport.initialize());
+app.use(passport.session());
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+var bodyParser = require('body-parser')
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+var path = require('path');
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+app.use('/public', express.static(__dirname + '/public'));
+
+app.use(flash());
+app.use(session({secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+app.set('view engine', 'pug');
+app.set('view options', { layout: false });
+
+
+require('./routes/routes.js')(app);
+
+
+
+
+// function listen(port) {
+//     app.portNumber = port;
+//     app.listen(port, () => {
+//         console.log("server is running on port :" + app.portNumber);
+//     }).on('error', function (err) {
+//         if(err.errno === 'EADDRINUSE') {
+//             console.log(`----- Port ${port} is busy, trying with port ${port + 1} -----`);
+//             listen(port + 1)
+//         } else {
+//             console.log(err);
+//         }
+//     });
+// }
+
+// listen(PORT);
+
+app.listen(PORT, () => {
+    console.log(`App running on port ${PORT}.`)
+  })
+
 
 module.exports = app;
