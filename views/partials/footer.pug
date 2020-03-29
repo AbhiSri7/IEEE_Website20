@@ -1,5 +1,57 @@
-hr
-br
-footer.footer
-	div.container
-		p footergoeshere
+//- hr
+//- br
+//- footer.footer
+//- 	div.container
+//- 		p IEEE
+
+
+
+doctype html
+head
+  meta(charset='utf-8')
+  meta(http-equiv='X-UA-Compatible' content='IE=edge')
+  meta(name='viewport' content='width=device-width, initial-scale=1')
+  meta(name='keywords' content='footer, address, phone, icons')
+  title Responsive Footer
+  link(rel='stylesheet' href='style.css')
+  link(rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css')
+  link(href='http://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css')
+header
+footer.footer-distributed
+  .footer-left
+    //img(src='public/images/ieeewhiteblack.png')
+    h3
+      | IEEE SBM
+    div.footer-links
+      a(href='/') Home 
+      | &#x9;&#x9;&#x9;&#x9;&#x9;|
+      a(href='#') Blog
+      | &#x9;&#x9;&#x9;&#x9;&#x9;|
+      a(href='#') About
+      | &#x9;&#x9;&#x9;&#x9;&#x9;|
+      a(href='#') Contact
+    div.footer-company-name &copy; 2020 IEEE Student Branch Manipal
+  .footer-center
+    div 
+      i.fa.fa-map-marker &#x9;&#x9;
+        span
+          | Manipal Institute of Technology,
+          | Udupi, Karnataka
+        | - 576104
+    div
+      i.fa.fa-phone &#x9;&#x9;
+      span +91 1111111111
+    div
+      i.fa.fa-envelope &#x9;&#x9;
+        a(href='mailto:contactus.ieeesbmanipal@gmail.com') contactus.ieeesbmanipal@gmail.com
+  .footer-right
+    .footer-icons
+      a(href='#')    |      
+        i.fa.fa-facebook
+      a(href='#')    |&#x9;  
+        i.fa.fa-twitter
+      a(href='#')    |&#x9;
+        i.fa.fa-instagram
+      a(href='#')    |&#x9;
+        i.fa.fa-linkedin
+      

@@ -1,6 +1,8 @@
 var express = require('express');
 var path = require('path');
 require('dotenv').config();
+var logger = require('morgan');
+
 const PORT = process.env.PORT || 3000
 
 var flash = require('connect-flash');
@@ -24,11 +26,16 @@ var bodyParser = require('body-parser')
 var path = require('path');
 
 app.use('/public', express.static(__dirname + '/public'));
-
+//app.use(express.favicon());
+app.use(logger('dev'));
 app.use(flash());
 app.use(session({secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: false
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+	    httpOnly: true,
+	    maxAge: 60*60*1000
+	}
 }))
 app.use(bodyParser.urlencoded({
     extended: true

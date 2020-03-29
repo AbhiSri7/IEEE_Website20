@@ -1,7 +1,10 @@
 var util = require('util');
 var express = require('express');
 var app = express();
+var path = require('path');
 var passport = require("passport");
+const LocalStrategy = require('passport-local').Strategy;
+const connectionString = process.env.DATABASE_URL;
 
 var fs = require('fs');
 var request = require('request');
@@ -13,13 +16,23 @@ const uuidv4 = require('uuid/v4');
 //Add email confirmation functionality
 //Add edit account page
 
+var v = 0;
 
 app.use(express.static('public'));
 
-const LocalStrategy = require('passport-local').Strategy;
-//const connectionString = process.env.DATABASE_URL;
-
 var currentAccountsData = [];
+
+const config = {
+	database: 'abhi',
+	host: 'localhost',
+	// this object will be passed to the TLSSocket constructor
+	ssl: {
+	  rejectUnauthorized: false,
+	  ca: fs.readFileSync('bin/cert.csr').toString(),
+	  key: fs.readFileSync('bin/private.key').toString(),
+	  cert: fs.readFileSync('bin/certificate.pem').toString(),
+	},
+  }
 
 const pool = new Pool({
 	user: 'abhi',
@@ -27,7 +40,7 @@ const pool = new Pool({
 	database: 'abhi',
 	password: 'abhis',
 	port: 5432,
-	ssl: true
+	ssl: false
 });
 
 module.exports = function (app) {
@@ -62,7 +75,7 @@ module.exports = function (app) {
 							res.redirect('/login');
 						}
 						else{
-							client.query('INSERT INTO ieeesbm (id, firstName, lastName, email, contact_no, password) VALUES ($1, $2, $3, $4, $5, $6)', [uuidv4(), req.body.firstName, req.body.lastName, req.body.email, req.body.contact_no, pwd], function(err, result) {
+							client.query('INSERT INTO ieeesbm (id, "firstname", "lastname", "email", "contact_no", password) VALUES ($1, $2, $3, $4, $5, $6);', [uuidv4(), req.body.firstname, req.body.lastname, req.body.email, req.body.contact_no, pwd], function(err, result) {
 								if(err){console.log(err);}
 								else{
 								
@@ -85,19 +98,25 @@ module.exports = function (app) {
 	
 	app.get('/account', function (req, res, next) {
 		if(req.isAuthenticated()){
+			console.log('s');
 			res.render('account', {title: "Account", userData: req.user, userData: req.user, messages: {danger: req.flash('danger'), warning: req.flash('warning'), success: req.flash('success')}});
+			v=0;
 		}
 		else{
+			console.log('12');
 			req.flash('warning', "You are not logged in.");
 			res.redirect('/login');
 		}
 	});
+
+	
 	
 	app.get('/login', function (req, res, next) {
 		if (req.isAuthenticated()) {
 			res.redirect('/account');
 		}
 		else{
+			console.log('7');
 			res.render('login', {title: "Log in", userData: req.user, messages: {danger: req.flash('danger'), warning: req.flash('warning'), success: req.flash('success')}});
 		}
 		
@@ -120,6 +139,7 @@ module.exports = function (app) {
 		if (req.body.remember) {
 			req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
 			} else {
+				console.log('6');
 			req.session.cookie.expires = false; // Cookie expires at end of session
 		}
 		res.redirect('/');
@@ -134,35 +154,42 @@ passport.use('local', new  LocalStrategy({passReqToCallback : true}, (req, usern
 	loginAttempt();
 	async function loginAttempt() {
 		
+		console.log('HI');
 		
-		const client = await pool.connect()
 		try{
+			const client = await pool.connect()
 			await client.query('BEGIN')
-			var currentAccountsData = await JSON.stringify(client.query('SELECT id, "firstName", "email", "password" FROM "users" WHERE "email"=$1', [username], function(err, result) {
-				
-				if(err) {
-					return done(err)
-				}	
-				if(result.rows[0] == null){
+			var currentAccountsData = await JSON.stringify(client.query('SELECT id, firstname, email, password FROM ieeesbm WHERE email=$1', [username], function (err, result) {
+				if (err) {
+					console.log('1');
+					return done(err);
+				}
+				if (result.rows[0] == null) {
 					req.flash('danger', "Oops. Incorrect login details.");
+					console.log('2');
 					return done(null, false);
 				}
-				else{
-					bcrypt.compare(password, result.rows[0].password, function(err, check) {
-						if (err){
+				else {
+					bcrypt.compare(password, result.rows[0].password, function (err, check) {
+						if (err) {
+							console.log('3');
 							console.log('Error while checking password');
 							return done();
 						}
-						else if (check){
-							return done(null, [{email: result.rows[0].email, firstName: result.rows[0].firstName}]);
+						else if (check) {
+							console.log('4');
+							v=1;
+							return done(null, [{ email: result.rows[0].email, firstname: result.rows[0].firstname }]);
 						}
-						else{
+						else {
+							console.log('5');
 							req.flash('danger', "Oops. Incorrect login details.");
 							return done(null, false);
 						}
 					});
 				}
-			}))
+			}));
+			client.release();
 		}
 		
 		catch(e){throw (e);}
@@ -175,9 +202,11 @@ passport.use('local', new  LocalStrategy({passReqToCallback : true}, (req, usern
 
 
 passport.serializeUser(function(user, done) {
+	console.log('10');
 	done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
+	console.log('11');
 	done(null, user);
 });		
