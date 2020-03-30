@@ -4,6 +4,7 @@ var app = express();
 var path = require('path');
 var passport = require("passport");
 const LocalStrategy = require('passport-local').Strategy;
+require('dotenv').config({path: __dirname + '/.env'});
 const connectionString = process.env.DATABASE_URL;
 
 var fs = require('fs');
@@ -139,9 +140,10 @@ module.exports = function (app) {
 		if (req.body.remember) {
 			req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
 			} else {
-				console.log('6');
+			console.log('6');
 			req.session.cookie.expires = false; // Cookie expires at end of session
 		}
+		console.log('15');
 		res.redirect('/');
 	});
 	
