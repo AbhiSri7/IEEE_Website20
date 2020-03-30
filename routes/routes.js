@@ -23,8 +23,8 @@ app.use(express.static('public'));
 var currentAccountsData = [];
 
 const config = {
-	database: 'abhi',
-	host: 'localhost',
+	database: process.env.PGDATABASE,
+	host: process.env.HOST,
 	// this object will be passed to the TLSSocket constructor
 	ssl: {
 	  rejectUnauthorized: false,
@@ -38,7 +38,7 @@ const pool = new Pool({
 	user: process.env.PGUSER,
 	host: process.env.PGHOST,
 	database: process.env.PGDATABASE,
-	password: process.env.PGPASSWORD,
+	password: process.env.PASSWORD,
 	port: process.env.PGPORT,
 	ssl: false
 });
