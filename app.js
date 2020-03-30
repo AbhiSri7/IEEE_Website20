@@ -3,6 +3,7 @@ var path = require('path');
 require('dotenv').config();
 var logger = require('morgan');
 
+require('dotenv').config({path: __dirname + '/.env'});
 const PORT = process.env.PORT || 3000
 
 var flash = require('connect-flash');

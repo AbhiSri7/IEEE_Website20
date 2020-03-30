@@ -35,11 +35,11 @@ const config = {
   }
 
 const pool = new Pool({
-	user: 'abhi',
-	host: 'localhost',
-	database: 'abhi',
-	password: 'abhis',
-	port: 5432,
+	user: process.env.PGUSER,
+	host: process.env.PGHOST,
+	database: process.env.PGDATABASE,
+	password: process.env.PGPASSWORD,
+	port: process.env.PGPORT,
 	ssl: false
 });
 
@@ -179,6 +179,7 @@ passport.use('local', new  LocalStrategy({passReqToCallback : true}, (req, usern
 						else if (check) {
 							console.log('4');
 							v=1;
+							console.log(result.rows[0]);
 							return done(null, [{ email: result.rows[0].email, firstname: result.rows[0].firstname }]);
 						}
 						else {
